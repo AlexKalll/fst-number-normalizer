@@ -1,0 +1,262 @@
+"""
+grammar.pynini
+--------------
+FST grammar for English cardinal number normalization (0-1000).
+
+This grammar defines a Finite-State Transducer that maps digit strings
+to their written-out English forms, handling:
+- Units (0-9)
+- Teens (10-19)
+- Tens (20, 30, ..., 90)
+- Hundreds (100, 200, ..., 900)
+- Hyphenated forms (21-99, e.g., "twenty-one")
+- Special case: 1000 -> "one thousand"
+
+The grammar is structured hierarchically:
+1. Define basic components (units, teens, tens)
+2. Compose two-digit numbers (0-99)
+3. Compose three-digit numbers (100-999)
+4. Add special case for 1000
+5. Union all components into final FST
+"""
+
+import pynini
+
+
+def build_fst():
+    """
+    Build the complete FST for number normalization.
+    
+    Returns:
+        A Pynini FST that maps digit strings (0-1000) to their English word forms.
+    """
+    
+    # ============================================================================
+    # Basic Components: Units (0-9)
+    # ============================================================================
+    units = (
+        pynini.cross("0", "zero") |
+        pynini.cross("1", "one") |
+        pynini.cross("2", "two") |
+        pynini.cross("3", "three") |
+        pynini.cross("4", "four") |
+        pynini.cross("5", "five") |
+        pynini.cross("6", "six") |
+        pynini.cross("7", "seven") |
+        pynini.cross("8", "eight") |
+        pynini.cross("9", "nine")
+    )
+    
+    # ============================================================================
+    # Teens (10-19)
+    # ============================================================================
+    teens = (
+        pynini.cross("10", "ten") |
+        pynini.cross("11", "eleven") |
+        pynini.cross("12", "twelve") |
+        pynini.cross("13", "thirteen") |
+        pynini.cross("14", "fourteen") |
+        pynini.cross("15", "fifteen") |
+        pynini.cross("16", "sixteen") |
+        pynini.cross("17", "seventeen") |
+        pynini.cross("18", "eighteen") |
+        pynini.cross("19", "nineteen")
+    )
+    
+    # ============================================================================
+    # Tens (20, 30, ..., 90)
+    # ============================================================================
+    tens = (
+        pynini.cross("2", "twenty") |
+        pynini.cross("3", "thirty") |
+        pynini.cross("4", "forty") |
+        pynini.cross("5", "fifty") |
+        pynini.cross("6", "sixty") |
+        pynini.cross("7", "seventy") |
+        pynini.cross("8", "eighty") |
+        pynini.cross("9", "ninety")
+    )
+    
+    # ============================================================================
+    # Two-digit numbers (0-99)
+    # ============================================================================
+    # Single digit (0-9)
+    single_digit = units
+    
+    # Two-digit numbers 20-99: tens + optional hyphen + units
+    # Examples: "20" -> "twenty", "21" -> "twenty-one", "45" -> "forty-five"
+    tens_with_units = (
+        (tens + pynini.cross("0", "")) |  # Multiples of 10: "20" -> "twenty"
+        (tens + pynini.cross("-", "-") + units)  # With units: "21" -> "twenty-one"
+    )
+    
+    # Two-digit numbers: combine single digits, teens, and tens
+    two_digit = single_digit | teens | tens_with_units
+    
+    # ============================================================================
+    # Three-digit numbers (100-999)
+    # ============================================================================
+    
+    
+    # ============================================================================
+    # Simplified Approach: Direct Enumeration for 100-999
+    # ============================================================================
+    # For production, we could optimize, but for clarity and correctness,
+    # let's build the hundreds systematically
+    
+    # Build a two-digit parser that takes "20"-"99" and outputs words
+    two_digit_20_99 = pynini.union(
+        # "20", "30", ..., "90"
+        pynini.cross("20", "twenty"),
+        pynini.cross("30", "thirty"),
+        pynini.cross("40", "forty"),
+        pynini.cross("50", "fifty"),
+        pynini.cross("60", "sixty"),
+        pynini.cross("70", "seventy"),
+        pynini.cross("80", "eighty"),
+        pynini.cross("90", "ninety"),
+        # "21"-"29"
+        pynini.cross("21", "twenty-one"),
+        pynini.cross("22", "twenty-two"),
+        pynini.cross("23", "twenty-three"),
+        pynini.cross("24", "twenty-four"),
+        pynini.cross("25", "twenty-five"),
+        pynini.cross("26", "twenty-six"),
+        pynini.cross("27", "twenty-seven"),
+        pynini.cross("28", "twenty-eight"),
+        pynini.cross("29", "twenty-nine"),
+        # "31"-"39"
+        pynini.cross("31", "thirty-one"),
+        pynini.cross("32", "thirty-two"),
+        pynini.cross("33", "thirty-three"),
+        pynini.cross("34", "thirty-four"),
+        pynini.cross("35", "thirty-five"),
+        pynini.cross("36", "thirty-six"),
+        pynini.cross("37", "thirty-seven"),
+        pynini.cross("38", "thirty-eight"),
+        pynini.cross("39", "thirty-nine"),
+        # "41"-"49"
+        pynini.cross("41", "forty-one"),
+        pynini.cross("42", "forty-two"),
+        pynini.cross("43", "forty-three"),
+        pynini.cross("44", "forty-four"),
+        pynini.cross("45", "forty-five"),
+        pynini.cross("46", "forty-six"),
+        pynini.cross("47", "forty-seven"),
+        pynini.cross("48", "forty-eight"),
+        pynini.cross("49", "forty-nine"),
+        # "51"-"59"
+        pynini.cross("51", "fifty-one"),
+        pynini.cross("52", "fifty-two"),
+        pynini.cross("53", "fifty-three"),
+        pynini.cross("54", "fifty-four"),
+        pynini.cross("55", "fifty-five"),
+        pynini.cross("56", "fifty-six"),
+        pynini.cross("57", "fifty-seven"),
+        pynini.cross("58", "fifty-eight"),
+        pynini.cross("59", "fifty-nine"),
+        # "61"-"69"
+        pynini.cross("61", "sixty-one"),
+        pynini.cross("62", "sixty-two"),
+        pynini.cross("63", "sixty-three"),
+        pynini.cross("64", "sixty-four"),
+        pynini.cross("65", "sixty-five"),
+        pynini.cross("66", "sixty-six"),
+        pynini.cross("67", "sixty-seven"),
+        pynini.cross("68", "sixty-eight"),
+        pynini.cross("69", "sixty-nine"),
+        # "71"-"79"
+        pynini.cross("71", "seventy-one"),
+        pynini.cross("72", "seventy-two"),
+        pynini.cross("73", "seventy-three"),
+        pynini.cross("74", "seventy-four"),
+        pynini.cross("75", "seventy-five"),
+        pynini.cross("76", "seventy-six"),
+        pynini.cross("77", "seventy-seven"),
+        pynini.cross("78", "seventy-eight"),
+        pynini.cross("79", "seventy-nine"),
+        # "81"-"89"
+        pynini.cross("81", "eighty-one"),
+        pynini.cross("82", "eighty-two"),
+        pynini.cross("83", "eighty-three"),
+        pynini.cross("84", "eighty-four"),
+        pynini.cross("85", "eighty-five"),
+        pynini.cross("86", "eighty-six"),
+        pynini.cross("87", "eighty-seven"),
+        pynini.cross("88", "eighty-eight"),
+        pynini.cross("89", "eighty-nine"),
+        # "91"-"99"
+        pynini.cross("91", "ninety-one"),
+        pynini.cross("92", "ninety-two"),
+        pynini.cross("93", "ninety-three"),
+        pynini.cross("94", "ninety-four"),
+        pynini.cross("95", "ninety-five"),
+        pynini.cross("96", "ninety-six"),
+        pynini.cross("97", "ninety-seven"),
+        pynini.cross("98", "ninety-eight"),
+        pynini.cross("99", "ninety-nine"),
+    )
+    
+    # Now build the complete two_digit FST (0-99)
+    two_digit = (
+        single_digit |  # 0-9
+        teens |  # 10-19
+        two_digit_20_99  # 20-99
+    )
+    
+    # ============================================================================
+    # Three-digit numbers (100-999)
+    # ============================================================================
+    # For simplicity and correctness, enumerate all 100-999 explicitly
+    # This ensures we handle all cases correctly
+    
+    hundreds_list = []
+    for h in range(1, 10):  # 1-9
+        hundreds_word = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][h-1]
+        for r in range(0, 100):  # 00-99
+            num_str = f"{h}{r:02d}"
+            if r == 0:
+                # "100", "200", ..., "900"
+                hundreds_list.append(pynini.cross(num_str, f"{hundreds_word} hundred"))
+            elif r < 10:
+                # "101"-"109", "201"-"209", etc.
+                remainder_word = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][r]
+                hundreds_list.append(pynini.cross(num_str, f"{hundreds_word} hundred {remainder_word}"))
+            elif r < 20:
+                # "110"-"119", "210"-"219", etc.
+                teen_words = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+                remainder_word = teen_words[r - 10]
+                hundreds_list.append(pynini.cross(num_str, f"{hundreds_word} hundred {remainder_word}"))
+            else:
+                # "120"-"199", "220"-"299", etc.
+                t = r // 10
+                u = r % 10
+                tens_words = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+                if u == 0:
+                    remainder_word = tens_words[t]
+                else:
+                    units_words = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+                    remainder_word = f"{tens_words[t]}-{units_words[u]}"
+                hundreds_list.append(pynini.cross(num_str, f"{hundreds_word} hundred {remainder_word}"))
+    
+    hundreds = pynini.union(*hundreds_list)
+    
+    # ============================================================================
+    # Special case: 1000
+    # ============================================================================
+    thousand = pynini.cross("1000", "one thousand")
+    
+    # ============================================================================
+    # Complete FST: Union of all components
+    # ============================================================================
+    complete_fst = (
+        two_digit |  # 0-99
+        hundreds |   # 100-999
+        thousand     # 1000
+    )
+    
+    # Optimize the FST
+    complete_fst = complete_fst.optimize()
+    
+    return complete_fst
+
