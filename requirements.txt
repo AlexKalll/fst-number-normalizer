@@ -1,2 +1,1 @@
-pynini
-openfst-python
+pynini==2.1.7
