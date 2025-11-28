@@ -1,14 +1,14 @@
-# FST Number Normalizer
+# FST Text Normalizer
 
-Text Normalization Internship Challenge - English cardinal numbers (0–1000).
+Text Normalization Challenge - English cardinal numbers (0–1000).
 
 FST-based text normalization system for English cardinal numbers with Python fallback.
 
 ## What This Project Does
 
 Normalizes cardinal numbers (0-1000) in English text:
-- "I have 3 dogs and 21 cats" → "I have three dogs and twenty-one cats"
-- "She is 45 years old." → "She is forty-five years old."
+- "I have 3 dogs and 21 cats" -> "I have three dogs and twenty-one cats"
+- "She is 45 years old." -> "She is forty-five years old."
 
 ## File Structure
 
