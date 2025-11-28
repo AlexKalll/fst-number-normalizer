@@ -30,15 +30,25 @@ fst-number-normalizer/
 
 ## Quick Start
 
+### Clone the repository
+```bash
+git clone https://github.com/AlexKalll/fst-number-normalizer.git
+cd fst-number-normalizer
+```
+
+### Create a Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate # for Linux
+# or for Windows
+# python -m venv venv
+# venv/bin/activate
+```
+
 ### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
-```
-
-**Note**: For FST-based normalization, install Pynini/OpenFST via conda:
-```bash
-conda install -c conda-forge pynini openfst
 ```
 
 ### Run the Normalizer
@@ -61,7 +71,8 @@ Generates `src/grammar.far` for FST-based normalization. Compilation time: < 1 s
 ### Run Tests
 
 ```bash
-pytest tests/ -v
+pytest tests -v # or python -m pytest
+# -v is better to see results in detail.
 ```
 
 ## Usage
