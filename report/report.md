@@ -2,19 +2,19 @@
 
 ## Executive Summary
 
-FST-based text normalization system for English cardinal numbers (0-1000) using Pynini/OpenFST. Compiles grammar to FAR file for efficient normalization, with Python fallback for portability.
+FST-based text normalization system for English cardinal numbers (0-1000) using Pynini. Compiles grammar to FAR file for efficient normalization, with Python fallback for portability.
 
 ## 1. Introduction
 
-Text normalization converts numeric strings to written-out forms (e.g., "21" → "twenty-one", "100" → "one hundred"). Critical for text-to-speech and speech recognition applications.
+This Text normalization converts numeric strings to written-out forms (e.g., "21" = "twenty-one", "100" = "one hundred"). Critical for text-to-speech and speech recognition applications.
 
 ## 2. Methodology
 
 ### 2.1 Approach
 
 Two-tier system:
-1. **Primary**: FST-based using Pynini/OpenFST (`src/grammar.pynini` → `src/grammar.far`)
-2. **Fallback**: Pure Python rule-based normalizer in `src/normalize.py` (identical output)
+1. **Primary**: FST-based using Pynini (`src/grammar.pynini` -> `src/grammar.far`)
+2. **Fallback**: Pure Python rule-based normalizer in `src/normalize.py` in case 
 
 ### 2.2 Grammar Design
 
@@ -28,8 +28,8 @@ Hierarchical FST structure:
 **Composite Numbers:**
 - Two-digit (20-99): Hyphenated forms (twenty-one, forty-five)
 - Hundreds (100-999): Pattern `[hundreds_word] + " hundred" + [remainder]`
-  - Examples: "100" → "one hundred", "101" → "one hundred one", "245" → "two hundred forty-five"
-- Special case: "1000" → "one thousand"
+  - Examples: "100" = "one hundred", "101" = "one hundred one", "245" = "two hundred forty-five"
+- Special case: "1000" = "one thousand"
 
 **FST Construction:**
 - Uses `pynini.cross()` for mappings, `pynini.union()` for combination, `.optimize()` for efficiency
@@ -50,17 +50,27 @@ Hierarchical FST structure:
 
 ## 3. How to Run
 
-### Prerequisites
+### Clone the repository
+```bash
+git clone https://github.com/AlexKalll/fst-number-normalizer.git
+cd fst-number-normalizer
+```
+### Create a Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate # or venv/Scripts/activate for Windows
+```
+
+### Install Packages
 ```bash
 pip install -r requirements.txt
-conda install -c conda-forge pynini openfst  # For FST support
 ```
 
 ### Compile Grammar
 ```bash
 python scripts/compile_grammar.py
 ```
-Loads `src/grammar.pynini`, builds FST, writes to `src/grammar.far`. Compilation time: < 1 second.
+Loads `src/grammar.pynini`, builds FST, writes to `src/grammar.far`.
 
 ### Usage
 ```bash
@@ -74,35 +84,33 @@ result = normalize_text("She is 45 years old.")
 
 ### Tests
 ```bash
-pytest tests/ -v
+pytest tests -v
 ```
 
 ## 4. Performance Metrics
 
 - **Compilation time**: < 1 second
-- **FAR file size**: ~50-100 KB
-- **Runtime (FST)**: ~0.1-1 ms per sentence
-- **Runtime (Python fallback)**: ~0.5-2 ms per sentence
+- **FAR file size**: ~50-150 KB in my case.
+- Runtime (Python fallback even it's slow)
 
 **WER Optimization:**
 - Comprehensive coverage (all 0-1000 explicitly handled)
 - Correct hyphenation (21-99)
 - Proper spacing for hundreds
-- Edge case handling (1000, boundaries)
 
 ## 5. Grammar Design Rationale
 
 **Why FSTs?**
-- Deterministic (same input → same output)
+- Deterministic (same input - same output)
 - Efficient lookup and composition
 - Composable with other FSTs
 - Standard in NLP/speech processing
 
 **Design Choices:**
 1. Explicit enumeration for 100-999 ensures correctness and debuggability
-2. Hierarchical structure (units → teens → tens → hundreds) for maintainability
-3. English hyphenation conventions (21-99 hyphenated)
-4. Python fallback for portability and evaluation
+2. Hierarchical structure (units - teens - tens - hundreds) for maintainability
+3. Correct hyphenation usage 
+4. Python fallback for reproducibility
 
 ## 6. Testing
 
@@ -128,8 +136,8 @@ fst-number-normalizer/
 
 ## 8. Conclusion
 
-Successfully implements FST-based normalization for English cardinal numbers 0-1000. System is accurate, efficient, robust (with fallback), and well-documented. Grammar design prioritizes correctness through explicit enumeration.
+This project implements FST-based normalization for English cardinal numbers 0-1000. System is accurate, efficient, robust (with fallback), and well-documented. Grammar design prioritizes correctness through explicit enumeration.
 
 ## 9. References
 - Pynini documentation: https://www.openfst.org/twiki/bin/view/FST/WebHome
-- https://huggingface.co/datasets/DigitalUmuganda/Text_Normalization_Challenge_Unitte
+- https://huggingface.co/datasets/DigitalUmuganda/Text_Normalization_Challenge_Unittests_Eng_Fra/blob/main/tutorial_FST_text_normalization.ipynb
