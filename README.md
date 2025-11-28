@@ -93,15 +93,10 @@ print(result)  # "The number is nine hundred ninety-nine."
 ## Features
 
 - Supports numbers 0-1000
-- Correct hyphenation (twenty-one, forty-five)
-- Proper spacing for hundreds (one hundred one)
-- Preserves text structure
-- FST-based (when Pynini available) or Python fallback
-- Comprehensive unit tests
-
-## Grammar Design
-
-Handles: units (0-9), teens (10-19), tens (20-90), two-digit with hyphenation (21-99), hundreds (100-999), and special case 1000. See `report/report.md` for details.
+- Correct hyphenation (like forty-five)
+- Proper spacing for hundreds (e.g. one hundred one)
+- unit tests
+- Handles: units (0-9), teens (10-19), tens (20-90), two-digit with hyphenation (21-99), hundreds (100-999), and special case 1000. See `report/report.md` for details.
 
 ## Requirements
 
