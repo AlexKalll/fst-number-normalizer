@@ -1,12 +1,7 @@
 """
-normalize.py
----------------
 Main entrypoint for number normalization. Attempts to load a compiled FAR
 grammar using Pynini/OpenFST. If Pynini or the FAR file is not available,
 falls back to a pure-Python rule-based normalizer for cardinal numbers 0-1000.
-
-This file is intentionally verbose and thoroughly commented to meet the
-challenge requirement for very clear, well-commented code.
 """
 from __future__ import annotations
 
@@ -18,7 +13,6 @@ import os
 
 def number_to_words(n: int) -> str:
     """Convert integer n (0 <= n <= 1000) to its English words.
-
     Rules:
     - Hyphenate numbers between 21-99 that are not multiples of 10 (e.g., 21 -> twenty-one)
     - Use 'one thousand' for 1000
@@ -27,31 +21,9 @@ def number_to_words(n: int) -> str:
     if not (0 <= n <= 1000):
         raise ValueError("number out of range (0-1000)")
 
-    units = [
-        "zero",
-        "one",
-        "two",
-        "three",
-        "four",
-        "five",
-        "six",
-        "seven",
-        "eight",
-        "nine",
-    ]
+    units = [ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" ]
 
-    teens = [
-        "ten",
-        "eleven",
-        "twelve",
-        "thirteen",
-        "fourteen",
-        "fifteen",
-        "sixteen",
-        "seventeen",
-        "eighteen",
-        "nineteen",
-    ]
+    teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
 
     tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
 
@@ -81,7 +53,6 @@ def number_to_words(n: int) -> str:
 
 def replace_numbers_in_text(text: str, convert_fn: Callable[[int], str]) -> str:
     """Replace integer numerals in `text` using `convert_fn`.
-
     - Matches non-negative integers in 0-1000.
     - Negative numbers and numbers outside range are left unchanged.
     - Preserves surrounding punctuation and spacing.

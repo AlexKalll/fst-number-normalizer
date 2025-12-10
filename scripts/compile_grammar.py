@@ -1,15 +1,9 @@
 """
-scripts/compile_grammar.py
---------------------------
 Helper script to compile `src/grammar.pynini` into `src/grammar.far` using Pynini.
-
 Usage:
     python scripts/compile_grammar.py
-
 This script tries to import Pynini, exec() the `grammar.pynini` file, call
 `build_fst()` and write a FAR archive with an entry named 'normalize'.
-
-Note: Pynini/OpenFST must be installed for this script to succeed.
 """
 from __future__ import annotations
 
